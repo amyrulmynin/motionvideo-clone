@@ -1,0 +1,146 @@
+[
+  {
+    "source": "https://video.azbahri.link/media/styles/app-showcase.webp",
+    "local": "/sites/video-azbahri/app-showcase.webp",
+    "content_type": "image/webp",
+    "bytes": 11436
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/claymation.webp",
+    "local": "/sites/video-azbahri/claymation.webp",
+    "content_type": "image/webp",
+    "bytes": 7384
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/comic-pop-art.webp",
+    "local": "/sites/video-azbahri/comic-pop-art.webp",
+    "content_type": "image/webp",
+    "bytes": 23286
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/data-story.webp",
+    "local": "/sites/video-azbahri/data-story.webp",
+    "content_type": "image/webp",
+    "bytes": 6752
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/flat-illustration.webp",
+    "local": "/sites/video-azbahri/flat-illustration.webp",
+    "content_type": "image/webp",
+    "bytes": 11036
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/food-menu.webp",
+    "local": "/sites/video-azbahri/food-menu.webp",
+    "content_type": "image/webp",
+    "bytes": 9732
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/infographic.webp",
+    "local": "/sites/video-azbahri/infographic.webp",
+    "content_type": "image/webp",
+    "bytes": 7316
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/isometric-diorama.webp",
+    "local": "/sites/video-azbahri/isometric-diorama.webp",
+    "content_type": "image/webp",
+    "bytes": 6566
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/kaiju-attack.webp",
+    "local": "/sites/video-azbahri/kaiju-attack.webp",
+    "content_type": "image/webp",
+    "bytes": 11624
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/kawaii-pastel.webp",
+    "local": "/sites/video-azbahri/kawaii-pastel.webp",
+    "content_type": "image/webp",
+    "bytes": 11060
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/kinetic-type.webp",
+    "local": "/sites/video-azbahri/kinetic-type.webp",
+    "content_type": "image/webp",
+    "bytes": 2680
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/liquid-gradient.webp",
+    "local": "/sites/video-azbahri/liquid-gradient.webp",
+    "content_type": "image/webp",
+    "bytes": 20546
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/malaysian-heritage.webp",
+    "local": "/sites/video-azbahri/malaysian-heritage.webp",
+    "content_type": "image/webp",
+    "bytes": 21986
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/map-journey.webp",
+    "local": "/sites/video-azbahri/map-journey.webp",
+    "content_type": "image/webp",
+    "bytes": 7108
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/neon-sign.webp",
+    "local": "/sites/video-azbahri/neon-sign.webp",
+    "content_type": "image/webp",
+    "bytes": 9086
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/product-turntable.webp",
+    "local": "/sites/video-azbahri/product-turntable.webp",
+    "content_type": "image/webp",
+    "bytes": 4328
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/radial-infographic.webp",
+    "local": "/sites/video-azbahri/radial-infographic.webp",
+    "content_type": "image/webp",
+    "bytes": 11486
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/retro-synthwave.webp",
+    "local": "/sites/video-azbahri/retro-synthwave.webp",
+    "content_type": "image/webp",
+    "bytes": 23580
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/slide-deck.webp",
+    "local": "/sites/video-azbahri/slide-deck.webp",
+    "content_type": "image/webp",
+    "bytes": 15218
+  },
+  {
+    "source": "https://video.azbahri.link/media/styles/tech-noir.webp",
+    "local": "/sites/video-azbahri/tech-noir.webp",
+    "content_type": "image/webp",
+    "bytes": 7128
+  },
+  {
+    "source": "https://fonts.bunny.net/instrument-sans/files/instrument-sans-latin-400-normal.woff2",
+    "local": "/sites/video-azbahri/instrument-sans-latin-400-normal.woff2",
+    "content_type": "font/woff2",
+    "bytes": 16860
+  },
+  {
+    "source": "https://fonts.bunny.net/instrument-sans/files/instrument-sans-latin-500-normal.woff2",
+    "local": "/sites/video-azbahri/instrument-sans-latin-500-normal.woff2",
+    "content_type": "font/woff2",
+    "bytes": 17232
+  },
+  {
+    "source": "https://fonts.bunny.net/instrument-sans/files/instrument-sans-latin-600-normal.woff2",
+    "local": "/sites/video-azbahri/instrument-sans-latin-600-normal.woff2",
+    "content_type": "font/woff2",
+    "bytes": 17408
+  },
+  {
+    "source": "https://fonts.bunny.net/instrument-sans/files/instrument-sans-latin-700-normal.woff2",
+    "local": "/sites/video-azbahri/instrument-sans-latin-700-normal.woff2",
+    "content_type": "font/woff2",
+    "bytes": 17012
+  }
+]
