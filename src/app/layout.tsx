@@ -32,16 +32,17 @@ const instrumentSans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Video prompts from ready-made styles · MotionVideo",
+  title: "Forge UI · Next.js Boilerplate",
   description:
-    "Pick a ready-made video style, add your content, and get a complete video prompt sized for any platform.",
+    "A production-ready Next.js UI starter with accessible forms, buttons, feedback, data display, and overlay patterns.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0a0e11",
+  themeColor: "#090b0e",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

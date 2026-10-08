@@ -1,488 +1,662 @@
-/* eslint-disable @next/next/no-img-element -- Native images preserve source sizing and loading behavior. */
-import type { CSSProperties, ReactNode } from "react";
+"use client";
 
-const homeUrl = "/";
-const loginUrl = "https://video.azbahri.link/login";
+import {
+  ArrowRight,
+  Bell,
+  Check,
+  ChevronDown,
+  CircleAlert,
+  Copy,
+  Inbox,
+  LoaderCircle,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Sparkles,
+  X,
+} from "lucide-react";
+import {
+  type FormEvent,
+  type KeyboardEvent,
+  type ReactNode,
+  useRef,
+  useState,
+} from "react";
 
-const styleAsset = (slug: string) => `/sites/video-azbahri/${slug}.webp`;
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const marqueeColumns: { style: CSSProperties; images: string[] }[] = [
-  {
-    style: { animationDuration: "70s" },
-    images: [
-      "kaiju-attack",
-      "infographic",
-      "radial-infographic",
-      "slide-deck",
-      "flat-illustration",
-      "isometric-diorama",
-    ],
-  },
-  {
-    style: { animationDuration: "55s", animationDirection: "reverse" },
-    images: [
-      "kinetic-type",
-      "malaysian-heritage",
-      "app-showcase",
-      "kawaii-pastel",
-      "tech-noir",
-      "food-menu",
-    ],
-  },
-  {
-    style: { animationDuration: "80s" },
-    images: [
-      "neon-sign",
-      "map-journey",
-      "liquid-gradient",
-      "data-story",
-      "claymation",
-      "retro-synthwave",
-    ],
-  },
+const tabs = ["Preview", "Code", "Usage"] as const;
+type TabName = (typeof tabs)[number];
+
+const palette = [
+  { name: "Canvas", value: "#090B0E", className: "bg-background" },
+  { name: "Surface", value: "#11151A", className: "bg-card" },
+  { name: "Border", value: "#2A3038", className: "bg-border" },
+  { name: "Accent", value: "#F6BD41", className: "bg-primary" },
+  { name: "Danger", value: "#FF6577", className: "bg-destructive" },
+  { name: "Success", value: "#55D187", className: "bg-emerald-400" },
 ];
 
-const steps: { step: string; title: string; body: string; icon: ReactNode }[] = [
-  {
-    step: "Step 1",
-    title: "Pick a style",
-    body: "Browse ready-made looks: neon signs, claymation, retro, infographics and more.",
-    icon: (
-      <>
-        <rect width="7" height="7" x="3" y="3" rx="1" />
-        <rect width="7" height="7" x="14" y="3" rx="1" />
-        <rect width="7" height="7" x="14" y="14" rx="1" />
-        <rect width="7" height="7" x="3" y="14" rx="1" />
-      </>
-    ),
-  },
-  {
-    step: "Step 2",
-    title: "Add your content",
-    body: "Describe what the video is about. Add photos and brand colours if you like.",
-    icon: (
-      <>
-        <path d="M17 6.1H3" />
-        <path d="M21 12.1H3" />
-        <path d="M15.1 18H3" />
-      </>
-    ),
-  },
-  {
-    step: "Step 3",
-    title: "Get your prompt",
-    body: "Choose the ratio, quality and length. Copy the full prompt or save it for later.",
-    icon: (
-      <>
-        <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72" />
-        <path d="m14 7 3 3" />
-        <path d="M5 6v4" />
-        <path d="M19 14v4" />
-        <path d="M10 2v2" />
-        <path d="M7 8H3" />
-        <path d="M21 16h-4" />
-        <path d="M11 3H9" />
-      </>
-    ),
-  },
-];
-
-const platformCards: {
-  ratio: string;
-  label: string;
-  width: string;
-  height: string;
-}[] = [
-  { ratio: "16:9", label: "YouTube, websites", width: "2.25rem", height: "1.266rem" },
-  { ratio: "9:16", label: "TikTok, Reels, Shorts", width: "1.266rem", height: "2.25rem" },
-  { ratio: "1:1", label: "Feed posts", width: "2.25rem", height: "2.25rem" },
-  { ratio: "4:5", label: "Portrait posts", width: "1.8rem", height: "2.25rem" },
-];
-
-const libraryStyles: { label: string; slug: string }[] = [
-  { label: "Neon sign", slug: "neon-sign" },
-  { label: "Claymation", slug: "claymation" },
-  { label: "Retro synthwave", slug: "retro-synthwave" },
-  { label: "Kaiju attack", slug: "kaiju-attack" },
-  { label: "Kawaii pastel", slug: "kawaii-pastel" },
-  { label: "Infographic", slug: "infographic" },
-  { label: "Food menu", slug: "food-menu" },
-  { label: "Malaysian heritage", slug: "malaysian-heritage" },
-  { label: "Kinetic typography", slug: "kinetic-type" },
-  { label: "Liquid gradient", slug: "liquid-gradient" },
-  { label: "Product turntable", slug: "product-turntable" },
-  { label: "Comic pop art", slug: "comic-pop-art" },
-];
-
-const ctaImages = [
-  "neon-sign",
-  "claymation",
-  "retro-synthwave",
-  "kaiju-attack",
-  "kawaii-pastel",
-  "infographic",
-];
-
-const footerLinks: { label: string; href: string }[] = [
-  { label: "Terms", href: "https://video.azbahri.link/terms" },
-  { label: "Privacy", href: "https://video.azbahri.link/privacy-policy" },
-  { label: "Refunds", href: "https://video.azbahri.link/refund-policy" },
-  { label: "Shipping", href: "https://video.azbahri.link/shipping-policy" },
-];
-
-function Logo() {
+function Section({
+  id,
+  title,
+  description,
+  children,
+}: {
+  id: string;
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
   return (
-    <svg viewBox="0 0 32 32" className="size-7 shrink-0" aria-hidden="true">
-      <rect width="32" height="32" rx="9" className="fill-accent" />
-      <path d="M9 9.5h3v13H9zM20 9.5h3v13h-3z" className="fill-on-accent/25" />
-      <path d="M13.5 11.2v9.6l7.2-4.8z" className="fill-on-accent" />
-    </svg>
+    <section id={id} className="section-shell">
+      <div className="mb-6 max-w-2xl">
+        <p className="eyebrow">Component set</p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+          {title}
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground sm:text-base">
+          {description}
+        </p>
+      </div>
+      {children}
+    </section>
   );
 }
 
-function ArrowRightIcon() {
+function StatusBadge({
+  tone,
+  children,
+}: {
+  tone: "neutral" | "success" | "warning" | "danger";
+  children: ReactNode;
+}) {
+  const tones = {
+    neutral: "border-border bg-muted text-muted-foreground",
+    success: "border-emerald-400/20 bg-emerald-400/10 text-emerald-300",
+    warning: "border-primary/20 bg-primary/10 text-primary",
+    danger: "border-destructive/20 bg-destructive/10 text-destructive",
+  };
+
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-4 shrink-0"
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium",
+        tones[tone],
+      )}
     >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
+      {children}
+    </span>
   );
 }
 
-function CheckIcon() {
+function Avatar({ initials, className }: { initials: string; className?: string }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-4 shrink-0 text-accent"
+    <span
+      className={cn(
+        "grid size-9 shrink-0 place-items-center rounded-full border border-white/10 bg-gradient-to-br from-primary/80 to-orange-500 text-xs font-bold text-primary-foreground shadow-sm",
+        className,
+      )}
+      aria-label={`Avatar for ${initials}`}
     >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
+      {initials}
+    </span>
   );
 }
 
 export default function Home() {
+  const [notifications, setNotifications] = useState(true);
+  const [submitted, setSubmitted] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabName>("Preview");
+  const [accordionOpen, setAccordionOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitted(true);
+  }
+
+  function handleTabKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    let nextIndex: number | null = null;
+
+    if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
+    if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = tabs.length - 1;
+
+    if (nextIndex === null) return;
+    event.preventDefault();
+    setActiveTab(tabs[nextIndex]);
+    tabRefs.current[nextIndex]?.focus();
+  }
+
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-white/5 bg-ink-950/85 backdrop-blur-lg">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-1.5 px-4">
-          <a
-            href={homeUrl}
-            className="flex items-center gap-2 mr-auto"
-            aria-label="MotionVideo home"
-          >
-            <Logo />
-            <span className="text-[1.0625rem] font-semibold tracking-tight">
-              motion<span className="text-accent">video</span>
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-5 px-4 sm:px-6 lg:px-8">
+          <a href="#top" className="flex items-center gap-2.5" aria-label="Forge UI home">
+            <span className="grid size-8 place-items-center rounded-xl bg-primary text-primary-foreground shadow-[0_0_24px_rgba(246,189,65,0.22)]">
+              <Sparkles className="size-4" aria-hidden="true" />
             </span>
+            <span className="font-semibold tracking-tight">Forge UI</span>
           </a>
-          <a href={loginUrl} className="btn h-9 px-3 text-muted hover:text-fg">
-            Log in
-          </a>
-          <a href={loginUrl} className="btn btn-accent h-9 px-3.5">
+          <nav
+            aria-label="Component sections"
+            className="ml-auto hidden items-center gap-1 lg:flex"
+          >
+            {[
+              ["Foundations", "foundations"],
+              ["Buttons", "buttons"],
+              ["Forms", "forms"],
+              ["Feedback", "feedback"],
+              ["Data", "data-display"],
+              ["Overlays", "overlays"],
+            ].map(([label, id]) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className="rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+          <Button className="ml-auto lg:ml-2" size="sm" onClick={() => dialogRef.current?.showModal()}>
             Get started
-          </a>
+          </Button>
         </div>
       </header>
 
-      <main>
-        <section className="mx-auto max-w-6xl px-4 pt-8 pb-10 lg:grid lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-12 lg:pt-14 lg:pb-16">
-          <div>
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent ring-1 ring-accent/20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4 shrink-0 size-3.5"
-              >
-                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-              </svg>
-              {" 44 video styles ready to use"}
-            </p>
-            <h1 className="mt-[15px] text-3xl leading-[1.1] font-semibold tracking-tight sm:mt-4 sm:text-4xl lg:text-5xl">
-              Pick a style. Add your story.{" "}
-              <span className="text-accent">Get the full video prompt.</span>
-            </h1>
-            <p className="mt-4 max-w-md text-muted sm:text-base">
-              Choose a ready-made video look, type what your video is about, and
-              MotionVideo writes the complete prompt, sized and timed for the
-              platform you need.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <a href={loginUrl} className="btn btn-accent h-11 px-5">
-                Get started <ArrowRightIcon />
-              </a>
-            </div>
-          </div>
-
+      <main id="top">
+        <section className="relative isolate overflow-hidden border-b border-border/60">
+          <div className="grid-bg absolute inset-0 -z-10 opacity-45" aria-hidden="true" />
           <div
+            className="absolute -top-44 left-1/2 -z-10 size-[34rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
             aria-hidden="true"
-            className="grid grid-cols-3 gap-2.5 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] mt-8 h-72 sm:h-96 lg:mt-0 lg:h-[34rem]"
-          >
-            {marqueeColumns.map((column) => (
-              <div
-                key={column.images[0]}
-                className="animate-marquee-up motion-reduce:animate-none"
-                style={column.style}
-              >
-                {[...column.images, ...column.images].map((slug, index) => (
-                  <img
-                    key={`${slug}-${index}`}
-                    src={styleAsset(slug)}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    className="mb-2.5 aspect-[4/5] w-full rounded-xl object-cover ring-1 ring-white/5"
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-4 py-10 lg:py-14">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-            How it works
-          </h2>
-          <p className="mt-1 text-muted">Three steps, about a minute.</p>
-
-          <ol className="mt-5 grid gap-2.5 sm:grid-cols-3">
-            {steps.map((item) => (
-              <li className="panel" key={item.step}>
-                <div className="flex items-center gap-2.5">
-                  <span className="grid size-9 place-items-center rounded-xl bg-accent/10 text-accent">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="size-4 shrink-0 size-4.5"
-                    >
-                      {item.icon}
-                    </svg>
-                  </span>
-                  <span className="text-2xs font-semibold tracking-wider text-faint uppercase">
-                    {item.step}
-                  </span>
-                </div>
-                <h3 className="mt-3 font-semibold">{item.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-muted">
-                  {item.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-4 py-10 lg:grid lg:grid-cols-2 lg:items-center lg:gap-12 lg:py-14">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-              Your content, in a proven style
-            </h2>
-            <p className="mt-2 max-w-md text-muted">
-              Each style is a tested prompt that describes the look, motion,
-              type, colour and sound. MotionVideo drops your content in and fills
-              in the size and length, so the result is ready to paste.
+          />
+          <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-32">
+            <StatusBadge tone="warning">Next.js 16 · React 19 · Tailwind 4</StatusBadge>
+            <h1 className="mt-6 max-w-4xl text-4xl leading-[1.05] font-semibold tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+              A sharp starting point for your next product.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+              Production-ready foundations, controls, states, and interaction patterns.
+              Copy the pieces you need; delete the rest.
             </p>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li className="flex items-center gap-2">
-                <CheckIcon /> No prompt writing skills needed
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon /> Same look every time you use a style
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon /> Saved in your account to reuse later
-              </li>
-            </ul>
-          </div>
-
-          <div className="panel mt-6 lg:mt-0">
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2.5">
-                <img
-                  src={styleAsset("neon-sign")}
-                  alt=""
-                  className="aspect-[4/5] w-9 rounded-md object-cover"
-                />
-                <div className="leading-tight">
-                  <p className="text-xs font-semibold">Neon sign</p>
-                  <p className="text-2xs text-muted">9:16 · 1080p · 15s</p>
-                </div>
-              </div>
-              <span className="flex items-center gap-1.5 text-2xs text-muted">
-                <span className="size-2 rounded-full bg-accent" /> Your content
-              </span>
-            </div>
-            <div className="rounded-xl bg-ink-950 p-3 text-xs leading-relaxed whitespace-pre-line text-fg/60 ring-1 ring-white/5">
-              <span>Make my video in this style: Neon sign.</span>
-              {"\n\n"}
-              <span className="-mx-1 rounded bg-accent/10 px-1 text-accent">
-                {
-                  'My content\n- What the video is about: Grand opening of Kopi Pagi cafe in Bangi. Headline: "Your morning starts here".'
-                }
-              </span>
-              {"\n\n"}
-              <span>
-                {
-                  "Look and motion\n- My message is a glowing neon tube sign, mounted on a dark brick wall at night. The sign is tilted very slightly, like it was hung by hand.\n- It starts switched off, so you can see the dark glass tubes. Then the tubes flicker on letter by letter with a realistic stutter: a few quick blinks, then a steady glow."
-                }
-              </span>
-              {"\n"}
-              <span className="text-faint">…</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-4 py-10 lg:py-14">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-            Made for every platform
-          </h2>
-          <p className="mt-1 text-muted">
-            480p to 1080p, 5 to 30 seconds, in the shape you need.
-          </p>
-
-          <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-            {platformCards.map((card) => (
-              <div className="panel flex items-center gap-3 p-3" key={card.ratio}>
-                <span className="grid size-10 shrink-0 place-items-center">
-                  <span
-                    className="rounded-[3px] border-2 border-accent bg-accent/15"
-                    style={{ width: card.width, height: card.height }}
-                  />
-                </span>
-                <span className="min-w-0 leading-tight">
-                  <span className="block font-semibold">{card.ratio}</span>
-                  <span className="block truncate text-2xs text-muted">
-                    {card.label}
-                  </span>
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-4 py-10 lg:py-14">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-                A library of styles
-              </h2>
-              <p className="mt-1 text-muted">
-                A few of the 44 looks you can use today.
-              </p>
-            </div>
-            <a
-              href={loginUrl}
-              className="hidden shrink-0 items-center gap-1 text-sm font-medium text-accent sm:inline-flex"
-            >
-              See them all <ArrowRightIcon />
-            </a>
-          </div>
-
-          <div className="mt-5 grid grid-cols-3 gap-x-2.5 gap-y-3.5 sm:grid-cols-4 lg:grid-cols-6">
-            {libraryStyles.map((style) => (
-              <a href={loginUrl} className="group block" key={style.slug}>
-                <div className="aspect-[4/5] overflow-hidden rounded-xl bg-ink-800 ring-1 ring-white/5">
-                  <img
-                    src={styleAsset(style.slug)}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    className="size-full object-cover transition duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <p className="mt-1.5 truncate text-[0.8125rem] font-medium">
-                  {style.label}
-                </p>
-              </a>
-            ))}
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-4 pt-4 pb-12 lg:pb-16">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-accent to-orange-500 px-5 py-8 text-on-accent sm:px-10 sm:py-10">
-            <div className="relative max-w-lg">
-              <h2 className="text-2xl leading-tight font-semibold tracking-tight sm:text-3xl">
-                Ready to make your first video prompt?
-              </h2>
-              <p className="mt-2 text-on-accent/75">
-                Create an account and pick a style. It takes about a minute.
-              </p>
-              <a
-                href={loginUrl}
-                className="btn mt-5 h-11 bg-ink-950 px-5 text-fg hover:bg-ink-900"
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button
+                size="lg"
+                className="h-11 rounded-xl px-5"
+                onClick={() => document.querySelector("#foundations")?.scrollIntoView({ behavior: "smooth" })}
               >
-                Create your account <ArrowRightIcon />
-              </a>
+                Explore components <ArrowRight data-icon="inline-end" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-11 rounded-xl px-5"
+                onClick={() => navigator.clipboard?.writeText("npx create-next-app@latest")}
+              >
+                <Copy data-icon="inline-start" /> Copy starter command
+              </Button>
             </div>
-            <div
-              className="pointer-events-none absolute top-1/2 -right-10 hidden w-72 -translate-y-1/2 rotate-6 gap-2 sm:grid sm:grid-cols-3"
-              aria-hidden="true"
-            >
-              {ctaImages.map((slug) => (
-                <img
-                  key={slug}
-                  src={styleAsset(slug)}
-                  alt=""
-                  loading="lazy"
-                  className="aspect-[4/5] w-full rounded-lg object-cover shadow-xl ring-1 ring-black/10"
-                />
+            <div className="mt-12 grid max-w-2xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-4">
+              {[
+                ["6", "Core sections"],
+                ["20+", "UI patterns"],
+                ["0", "Extra packages"],
+                ["100%", "Responsive"],
+              ].map(([value, label]) => (
+                <div key={label} className="bg-card px-4 py-4">
+                  <p className="text-xl font-semibold text-primary">{value}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{label}</p>
+                </div>
               ))}
             </div>
           </div>
         </section>
+
+        <Section
+          id="foundations"
+          title="Foundations"
+          description="A compact token set for colour, type, radius, and spacing. Change values once in globals.css to retheme every component."
+        >
+          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="surface p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="font-semibold">Colour tokens</h3>
+                <code className="code-pill">CSS variables</code>
+              </div>
+              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {palette.map((colour) => (
+                  <div key={colour.name} className="rounded-xl border border-border bg-background p-2.5">
+                    <div className={cn("h-16 rounded-lg border border-white/10", colour.className)} />
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium">{colour.name}</span>
+                      <code className="text-[10px] text-muted-foreground">{colour.value}</code>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="surface p-5 sm:p-6">
+              <h3 className="font-semibold">Type scale</h3>
+              <div className="mt-5 space-y-5">
+                <div>
+                  <p className="text-3xl font-semibold tracking-tight">Display</p>
+                  <p className="mt-1 text-xs text-muted-foreground">30px / semibold</p>
+                </div>
+                <div>
+                  <p className="text-xl font-semibold tracking-tight">Section heading</p>
+                  <p className="mt-1 text-xs text-muted-foreground">20px / semibold</p>
+                </div>
+                <div>
+                  <p className="text-sm leading-6">Body text keeps long-form content readable.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">14px / regular</p>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {["8", "12", "16", "24", "32"].map((space) => (
+                    <code key={space} className="code-pill">{space}px</code>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        <Section
+          id="buttons"
+          title="Buttons"
+          description="Clear hierarchy, complete states, useful sizes, and visible keyboard focus out of the box."
+        >
+          <div className="surface p-5 sm:p-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <Button>Primary</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="outline">Outline</Button>
+              <Button variant="ghost">Ghost</Button>
+              <Button variant="destructive">Destructive</Button>
+              <Button disabled>
+                <LoaderCircle className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
+                Loading
+              </Button>
+              <Button disabled variant="outline">Disabled</Button>
+              <Button size="icon" aria-label="Add item">
+                <Plus aria-hidden="true" />
+              </Button>
+            </div>
+            <div className="my-6 h-px bg-border" />
+            <div className="flex flex-wrap items-end gap-3">
+              <Button size="xs">Extra small</Button>
+              <Button size="sm">Small</Button>
+              <Button>Default</Button>
+              <Button size="lg">Large <ArrowRight data-icon="inline-end" /></Button>
+              <Button variant="link">Text link</Button>
+            </div>
+          </div>
+        </Section>
+
+        <Section
+          id="forms"
+          title="Forms"
+          description="Native controls with associated labels, guidance, validation, disabled states, and real submit/reset behaviour."
+        >
+          <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+            <form className="surface p-5 sm:p-6" onSubmit={handleSubmit} onReset={() => setSubmitted(false)}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="font-semibold">Project request</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">Fields marked required must be completed.</p>
+                </div>
+                <StatusBadge tone="neutral">Form</StatusBadge>
+              </div>
+
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="label" htmlFor="full-name">Full name</label>
+                  <input className="field" id="full-name" name="fullName" autoComplete="name" required placeholder="Alya Rahman" />
+                  <p className="help">Use the name shown on your account.</p>
+                </div>
+                <div>
+                  <label className="label" htmlFor="email">Work email</label>
+                  <input className="field" id="email" type="email" name="email" autoComplete="email" required placeholder="alya@company.com" />
+                  <p className="help">We will only use this for the request.</p>
+                </div>
+                <div>
+                  <label className="label" htmlFor="company-size">Company size</label>
+                  <select className="field" id="company-size" name="companySize" defaultValue="" required>
+                    <option value="" disabled>Select team size</option>
+                    <option>1–10 people</option>
+                    <option>11–50 people</option>
+                    <option>51–250 people</option>
+                    <option>251+ people</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="label" htmlFor="start-date">Target start</label>
+                  <input className="field" id="start-date" type="date" name="startDate" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="label" htmlFor="project-brief">Project brief</label>
+                  <textarea className="field min-h-28 resize-y py-2.5" id="project-brief" name="projectBrief" required placeholder="Tell us what success looks like…" />
+                  <p className="help">Include audience, outcome, and timing.</p>
+                </div>
+              </div>
+
+              <fieldset className="mt-5">
+                <legend className="label">Priority</legend>
+                <div className="flex flex-wrap gap-4">
+                  {["Speed", "Quality", "Budget"].map((priority, index) => (
+                    <label key={priority} className="inline-flex items-center gap-2 text-sm">
+                      <input className="size-4 accent-primary" type="radio" name="priority" defaultChecked={index === 1} value={priority.toLowerCase()} />
+                      {priority}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <div className="mt-5 flex items-start gap-2.5">
+                <input className="mt-0.5 size-4 rounded accent-primary" id="terms" type="checkbox" required />
+                <label htmlFor="terms" className="text-sm leading-5 text-muted-foreground">
+                  I agree that this demo may validate the form locally.
+                </label>
+              </div>
+
+              {submitted && (
+                <p className="mt-5 flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2.5 text-sm text-emerald-300" role="status">
+                  <Check className="size-4" aria-hidden="true" /> Request validated successfully.
+                </p>
+              )}
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                <Button type="submit">Submit request</Button>
+                <Button type="reset" variant="outline">Reset</Button>
+              </div>
+            </form>
+
+            <div className="surface p-5 sm:p-6">
+              <h3 className="font-semibold">Control states</h3>
+              <div className="mt-5 space-y-5">
+                <div>
+                  <label className="label" htmlFor="workspace-slug">Error state</label>
+                  <input className="field border-destructive focus-visible:border-destructive focus-visible:ring-destructive/25" id="workspace-slug" defaultValue="my workspace" aria-invalid="true" aria-describedby="slug-error" />
+                  <p className="mt-1.5 flex items-center gap-1.5 text-xs text-destructive" id="slug-error">
+                    <CircleAlert className="size-3.5" aria-hidden="true" /> Spaces are not allowed.
+                  </p>
+                </div>
+                <div>
+                  <label className="label" htmlFor="disabled-input">Disabled state</label>
+                  <input className="field" id="disabled-input" value="Unavailable on this plan" disabled readOnly />
+                </div>
+                <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background p-3.5">
+                  <div>
+                    <p className="text-sm font-medium">Email notifications</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Weekly product updates.</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={notifications}
+                    onClick={() => setNotifications((current) => !current)}
+                    className={cn(
+                      "relative h-6 w-11 shrink-0 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      notifications ? "border-primary bg-primary" : "border-border bg-muted",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "absolute top-0.5 size-4.5 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none",
+                        notifications ? "translate-x-5" : "translate-x-0.5",
+                      )}
+                    />
+                    <span className="sr-only">Toggle email notifications</span>
+                  </button>
+                </div>
+                <div>
+                  <label className="label" htmlFor="search-example">Input with icon</label>
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                    <input className="field pl-9" id="search-example" type="search" placeholder="Search components" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        <Section
+          id="feedback"
+          title="Feedback"
+          description="Persistent alerts for context and transient toast feedback for completed actions."
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="surface border-sky-400/20 bg-sky-400/[0.06] p-4">
+              <div className="flex gap-3">
+                <CircleAlert className="mt-0.5 size-4 shrink-0 text-sky-300" aria-hidden="true" />
+                <div><h3 className="text-sm font-semibold text-sky-200">Information</h3><p className="mt-1 text-xs leading-5 text-sky-100/65">New settings apply on the next deployment.</p></div>
+              </div>
+            </div>
+            <div className="surface border-emerald-400/20 bg-emerald-400/[0.06] p-4">
+              <div className="flex gap-3">
+                <Check className="mt-0.5 size-4 shrink-0 text-emerald-300" aria-hidden="true" />
+                <div><h3 className="text-sm font-semibold text-emerald-200">Success</h3><p className="mt-1 text-xs leading-5 text-emerald-100/65">Your workspace has been published.</p></div>
+              </div>
+            </div>
+            <div className="surface border-destructive/20 bg-destructive/[0.06] p-4">
+              <div className="flex gap-3">
+                <CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
+                <div><h3 className="text-sm font-semibold text-red-200">Action needed</h3><p className="mt-1 text-xs leading-5 text-red-100/65">Add a payment method to continue.</p></div>
+              </div>
+            </div>
+          </div>
+          <div className="surface mt-4 flex flex-wrap items-center justify-between gap-4 p-5">
+            <div>
+              <h3 className="font-semibold">Toast notification</h3>
+              <p className="mt-1 text-xs text-muted-foreground">Use for concise, non-blocking confirmation.</p>
+            </div>
+            <Button variant="outline" onClick={() => setToastVisible(true)}>
+              <span>Show toast</span> <Bell data-icon="inline-end" />
+            </Button>
+          </div>
+          <div className="pointer-events-none fixed right-4 bottom-4 z-50" aria-live="polite" aria-atomic="true">
+            {toastVisible && (
+              <div className="pointer-events-auto flex w-[min(22rem,calc(100vw-2rem))] items-start gap-3 rounded-2xl border border-border bg-popover p-4 text-popover-foreground shadow-2xl">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-emerald-400/10 text-emerald-300"><Check className="size-4" aria-hidden="true" /></span>
+                <div className="min-w-0 flex-1"><p className="text-sm font-semibold">Changes saved</p><p className="mt-0.5 text-xs text-muted-foreground">Your preferences are up to date.</p></div>
+                <button type="button" className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setToastVisible(false)} aria-label="Dismiss notification"><X className="size-4" /></button>
+              </div>
+            )}
+          </div>
+        </Section>
+
+        <Section
+          id="data-display"
+          title="Data display"
+          description="Cards, status, people, progress, loading, empty states, tables, and navigation patterns for product screens."
+        >
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["Monthly revenue", "$84,240", "+12.4%"],
+              ["Active customers", "2,430", "+8.1%"],
+              ["Conversion rate", "6.84%", "+1.2%"],
+            ].map(([label, value, change]) => (
+              <div key={label} className="surface p-5">
+                <div className="flex items-center justify-between gap-4"><p className="text-xs font-medium text-muted-foreground">{label}</p><Button size="icon-xs" variant="ghost" aria-label={`More options for ${label}`}><MoreHorizontal /></Button></div>
+                <p className="mt-4 text-2xl font-semibold tracking-tight">{value}</p>
+                <p className="mt-2 text-xs font-medium text-emerald-300">{change} <span className="font-normal text-muted-foreground">vs last month</span></p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+            <div className="surface overflow-hidden">
+              <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-4">
+                <div><h3 className="font-semibold">Recent projects</h3><p className="mt-0.5 text-xs text-muted-foreground">Updated a few seconds ago</p></div>
+                <Button size="sm" variant="outline">View all</Button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[36rem] text-left text-sm">
+                  <thead className="bg-muted/45 text-xs text-muted-foreground">
+                    <tr><th scope="col" className="px-5 py-3 font-medium">Project</th><th scope="col" className="px-4 py-3 font-medium">Owner</th><th scope="col" className="px-4 py-3 font-medium">Status</th><th scope="col" className="px-5 py-3 text-right font-medium">Updated</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {[
+                      ["Atlas dashboard", "AR", "Live", "2m ago"],
+                      ["Northstar mobile", "DM", "Review", "1h ago"],
+                      ["Acme storefront", "SK", "Draft", "Yesterday"],
+                    ].map(([project, owner, status, updated]) => (
+                      <tr key={project} className="hover:bg-muted/30">
+                        <td className="px-5 py-3.5 font-medium">{project}</td>
+                        <td className="px-4 py-3.5"><Avatar initials={owner} className="size-7 text-[10px]" /></td>
+                        <td className="px-4 py-3.5"><StatusBadge tone={status === "Live" ? "success" : status === "Review" ? "warning" : "neutral"}>{status}</StatusBadge></td>
+                        <td className="px-5 py-3.5 text-right text-xs text-muted-foreground">{updated}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="surface p-5">
+                <div className="flex items-center justify-between"><h3 className="font-semibold">Launch progress</h3><span className="text-xs text-muted-foreground">72%</span></div>
+                <progress className="mt-4 h-2 w-full overflow-hidden rounded-full" value="72" max="100">72%</progress>
+                <div className="mt-4 flex -space-x-2">
+                  {['AR', 'DM', 'SK'].map((initials) => <Avatar key={initials} initials={initials} className="ring-2 ring-card" />)}
+                  <span className="grid size-9 place-items-center rounded-full border border-border bg-muted text-xs text-muted-foreground ring-2 ring-card">+4</span>
+                </div>
+              </div>
+              <div className="surface p-5" role="status" aria-label="Loading content">
+                <span className="sr-only">Loading</span>
+                <div className="h-3 w-2/5 animate-pulse rounded-full bg-muted motion-reduce:animate-none" />
+                <div className="mt-4 h-8 w-3/5 animate-pulse rounded-lg bg-muted motion-reduce:animate-none" />
+                <div className="mt-3 h-3 w-full animate-pulse rounded-full bg-muted motion-reduce:animate-none" />
+                <div className="mt-2 h-3 w-4/5 animate-pulse rounded-full bg-muted motion-reduce:animate-none" />
+                <p className="mt-4 text-xs text-muted-foreground">Skeleton loading state</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="surface mt-4 grid place-items-center px-5 py-12 text-center">
+            <span className="grid size-12 place-items-center rounded-2xl border border-border bg-muted text-muted-foreground"><Inbox className="size-5" aria-hidden="true" /></span>
+            <h3 className="mt-4 font-semibold">Empty state</h3>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">No projects match this view. Create one to start organizing your work.</p>
+            <Button className="mt-5"><Plus data-icon="inline-start" /> New project</Button>
+          </div>
+
+          <nav className="mt-4 flex items-center justify-between gap-4" aria-label="Pagination">
+            <p className="text-xs text-muted-foreground">Showing 1–10 of 48</p>
+            <div className="flex items-center gap-1">
+              <Button size="sm" variant="outline" disabled>Previous</Button>
+              <Button size="icon-sm" aria-current="page">1</Button>
+              <Button size="icon-sm" variant="ghost">2</Button>
+              <Button size="icon-sm" variant="ghost">3</Button>
+              <Button size="sm" variant="outline">Next</Button>
+            </div>
+          </nav>
+        </Section>
+
+        <Section
+          id="overlays"
+          title="Overlays"
+          description="Tabs, disclosure, toast, and a native modal demonstrate real keyboard-friendly interactions without extra packages."
+        >
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="surface p-5 sm:p-6">
+              <h3 className="font-semibold">Tabs</h3>
+              <div className="mt-4 inline-flex rounded-xl border border-border bg-background p-1" role="tablist" aria-label="Component example">
+                {tabs.map((tab, index) => (
+                  <button
+                    key={tab}
+                    ref={(element) => { tabRefs.current[index] = element; }}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === tab}
+                    aria-controls={`panel-${tab.toLowerCase()}`}
+                    id={`tab-${tab.toLowerCase()}`}
+                    tabIndex={activeTab === tab ? 0 : -1}
+                    onClick={() => setActiveTab(tab)}
+                    onKeyDown={(event) => handleTabKey(event, index)}
+                    className={cn(
+                      "rounded-lg px-3 py-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      activeTab === tab ? "bg-muted text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+              <div
+                className="mt-4 min-h-32 rounded-xl border border-border bg-background p-4"
+                role="tabpanel"
+                id={`panel-${activeTab.toLowerCase()}`}
+                aria-labelledby={`tab-${activeTab.toLowerCase()}`}
+              >
+                {activeTab === "Preview" && <div><p className="text-sm font-medium">Ready to compose</p><p className="mt-2 text-xs leading-5 text-muted-foreground">Use tabs for related views at the same hierarchy. Arrow keys move focus between options.</p></div>}
+                {activeTab === "Code" && <pre className="overflow-x-auto text-xs leading-5 text-primary"><code>{`<Button variant="outline">\n  Continue\n</Button>`}</code></pre>}
+                {activeTab === "Usage" && <div><p className="text-sm font-medium">Keep labels concise</p><p className="mt-2 text-xs leading-5 text-muted-foreground">Use two to four tabs. For larger navigation sets, use links instead.</p></div>}
+              </div>
+            </div>
+
+            <div className="surface p-5 sm:p-6">
+              <h3 className="font-semibold">Disclosure &amp; dialog</h3>
+              <div className="mt-4 rounded-xl border border-border bg-background">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between gap-4 rounded-xl px-4 py-3.5 text-left text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                  aria-expanded={accordionOpen}
+                  aria-controls="accordion-content"
+                  onClick={() => setAccordionOpen((current) => !current)}
+                >
+                  What is included in this starter?
+                  <ChevronDown className={cn("size-4 shrink-0 text-muted-foreground transition-transform motion-reduce:transition-none", accordionOpen && "rotate-180")} aria-hidden="true" />
+                </button>
+                <div id="accordion-content" hidden={!accordionOpen} className="border-t border-border px-4 py-3 text-xs leading-5 text-muted-foreground">
+                  Theme tokens, reusable buttons, complete forms, common feedback, data patterns, and accessible interactions.
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-dashed border-border p-5 text-center">
+                <p className="text-sm font-medium">Need a blocking decision?</p>
+                <p className="mt-1 text-xs text-muted-foreground">Use a modal only when attention cannot move elsewhere.</p>
+                <Button className="mt-4" variant="outline" aria-haspopup="dialog" onClick={() => dialogRef.current?.showModal()}>
+                  Open dialog
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Section>
       </main>
 
-      <footer className="border-t border-white/5">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 sm:flex-row">
-          <a
-            href={homeUrl}
-            className="flex items-center gap-2"
-            aria-label="MotionVideo home"
-          >
-            <Logo />
-            <span className="text-[1.0625rem] font-semibold tracking-tight">
-              motion<span className="text-accent">video</span>
-            </span>
-          </a>
-          <p className="flex gap-3 text-xs text-muted">
-            {footerLinks.map((link) => (
-              <a href={link.href} className="hover:text-fg" key={link.href}>
-                {link.label}
-              </a>
-            ))}
-          </p>
-          <p className="text-xs text-faint">
-            © 2026 AZBAHRI Technologies Enterprise
-          </p>
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p>Forge UI · Built as a starting point, not a constraint.</p>
+          <a className="w-fit text-foreground hover:text-primary" href="#top">Back to top</a>
         </div>
       </footer>
+
+      <dialog
+        ref={dialogRef}
+        className="m-auto w-[min(30rem,calc(100%-2rem))] rounded-2xl border border-border bg-popover p-0 text-popover-foreground shadow-2xl backdrop:bg-black/75"
+        aria-labelledby="dialog-title"
+        onClose={() => setSubmitted(false)}
+      >
+        <form method="dialog" className="p-5 sm:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary"><Sparkles className="size-5" aria-hidden="true" /></span>
+            <Button size="icon-sm" variant="ghost" type="submit" aria-label="Close dialog"><X /></Button>
+          </div>
+          <h2 className="mt-5 text-xl font-semibold tracking-tight" id="dialog-title">Start from a strong baseline</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Copy the components you need, connect your real data, and replace the demo content. No hidden setup required.</p>
+          <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button type="submit" variant="outline">Cancel</Button>
+            <Button type="submit">Use this starter</Button>
+          </div>
+        </form>
+      </dialog>
     </>
   );
 }
