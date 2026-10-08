@@ -91,6 +91,9 @@ test("renders a labelled, production-style form", () => {
   assert.match(html, /type="checkbox"/);
   assert.match(html, /type="radio"/);
   assert.match(html, /role="switch"/);
+  assert.match(html, /aria-labelledby="email-notifications-label"/);
+  assert.match(html, /data-slot="switch-thumb"/);
+  assert.doesNotMatch(html, /translate-x-5/);
   assert.match(html, />Submit request</);
 });
 
@@ -102,4 +105,24 @@ test("renders accessible interactive-pattern triggers", () => {
   assert.match(html, />Show toast</);
   assert.match(html, /<table/);
   assert.doesNotMatch(html, /video\.azbahri\.link\/media/);
+});
+
+test("renders advanced interactive components and animated icons", () => {
+  for (const label of [
+    "Command palette",
+    "Dropdown menu",
+    "Combobox",
+    "File upload",
+    "Range slider",
+    "Stepper",
+    "Tooltip",
+  ]) {
+    expectMatch(new RegExp(label), `advanced component: ${label}`);
+  }
+
+  assert.match(html, /aria-haspopup="menu"/);
+  assert.match(html, /role="combobox"/);
+  assert.match(html, /type="file"/);
+  assert.match(html, /type="range"/);
+  assert.match(html, /class="[^"]*icon-motion/);
 });

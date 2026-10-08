@@ -23,7 +23,9 @@ import {
   useState,
 } from "react";
 
+import { AdvancedShowcase } from "@/components/advanced-showcase";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 const tabs = ["Preview", "Code", "Usage"] as const;
@@ -153,6 +155,7 @@ export default function Home() {
               ["Forms", "forms"],
               ["Feedback", "feedback"],
               ["Data", "data-display"],
+              ["Advanced", "advanced"],
               ["Overlays", "overlays"],
             ].map(([label, id]) => (
               <a
@@ -394,27 +397,19 @@ export default function Home() {
                 </div>
                 <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background p-3.5">
                   <div>
-                    <p className="text-sm font-medium">Email notifications</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">Weekly product updates.</p>
+                    <p className="text-sm font-medium" id="email-notifications-label">
+                      Email notifications
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground" id="email-notifications-description">
+                      Weekly product updates.
+                    </p>
                   </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={notifications}
-                    onClick={() => setNotifications((current) => !current)}
-                    className={cn(
-                      "relative h-6 w-11 shrink-0 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      notifications ? "border-primary bg-primary" : "border-border bg-muted",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "absolute top-0.5 size-4.5 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none",
-                        notifications ? "translate-x-5" : "translate-x-0.5",
-                      )}
-                    />
-                    <span className="sr-only">Toggle email notifications</span>
-                  </button>
+                  <Switch
+                    checked={notifications}
+                    onCheckedChange={setNotifications}
+                    aria-labelledby="email-notifications-label"
+                    aria-describedby="email-notifications-description"
+                  />
                 </div>
                 <div>
                   <label className="label" htmlFor="search-example">Input with icon</label>
@@ -559,6 +554,8 @@ export default function Home() {
             </div>
           </nav>
         </Section>
+
+        <AdvancedShowcase />
 
         <Section
           id="overlays"
