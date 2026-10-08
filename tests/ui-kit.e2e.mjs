@@ -104,6 +104,8 @@ test("renders accessible interactive-pattern triggers", () => {
   assert.match(html, /aria-haspopup="dialog"/);
   assert.match(html, />Show toast</);
   assert.match(html, /<table/);
+  assert.match(html, /href="\/login"/);
+  assert.match(html, /href="\/register"/);
   assert.doesNotMatch(html, /video\.azbahri\.link\/media/);
 });
 
@@ -125,4 +127,61 @@ test("renders advanced interactive components and animated icons", () => {
   assert.match(html, /type="file"/);
   assert.match(html, /type="range"/);
   assert.match(html, /class="[^"]*icon-motion/);
+});
+
+test("renders the login route as a two-column auth page", async () => {
+  const response = await fetch(`${url}/login`);
+  assert.equal(response.status, 200);
+
+  const authHtml = await response.text();
+  assert.match(authHtml, /data-auth-layout="split"/);
+  assert.match(authHtml, /data-auth-panel="form"/);
+  assert.match(authHtml, /data-auth-panel="visual"/);
+  assert.match(authHtml, /<img[^>]*tech-noir\.webp/);
+  assert.match(authHtml, /<form[^>]*aria-labelledby="login-title"/);
+  assert.match(authHtml, /for="login-email"/);
+  assert.match(
+    authHtml,
+    /<input(?=[^>]*id="login-email")(?=[^>]*type="email")(?=[^>]*autoComplete="email")[^>]*>/i,
+  );
+  assert.match(authHtml, /for="login-password"/);
+  assert.match(
+    authHtml,
+    /<input(?=[^>]*id="login-password")(?=[^>]*type="password")(?=[^>]*autoComplete="current-password")[^>]*>/i,
+  );
+  assert.match(authHtml, /aria-controls="login-password"/);
+  assert.match(authHtml, /href="\/register"/);
+  assert.match(authHtml, />Sign in</);
+});
+
+test("renders the register route as a two-column auth page", async () => {
+  const response = await fetch(`${url}/register`);
+  assert.equal(response.status, 200);
+
+  const authHtml = await response.text();
+  assert.match(authHtml, /data-auth-layout="split"/);
+  assert.match(authHtml, /data-auth-panel="form"/);
+  assert.match(authHtml, /data-auth-panel="visual"/);
+  assert.match(authHtml, /<img[^>]*tech-noir\.webp/);
+  assert.match(authHtml, /<form[^>]*aria-labelledby="register-title"/);
+  assert.match(authHtml, /for="register-name"/);
+  assert.match(
+    authHtml,
+    /<input(?=[^>]*id="register-name")(?=[^>]*autoComplete="name")[^>]*>/i,
+  );
+  assert.match(authHtml, /for="register-email"/);
+  assert.match(
+    authHtml,
+    /<input(?=[^>]*id="register-email")(?=[^>]*type="email")(?=[^>]*autoComplete="email")[^>]*>/i,
+  );
+  assert.match(authHtml, /for="register-password"/);
+  assert.match(
+    authHtml,
+    /<input(?=[^>]*id="register-password")(?=[^>]*type="password")(?=[^>]*autoComplete="new-password")[^>]*>/i,
+  );
+  assert.match(authHtml, /for="register-confirm-password"/);
+  assert.match(authHtml, /aria-controls="register-password"/);
+  assert.match(authHtml, /type="checkbox"[^>]*required/);
+  assert.match(authHtml, /href="\/login"/);
+  assert.match(authHtml, />Create account</);
 });

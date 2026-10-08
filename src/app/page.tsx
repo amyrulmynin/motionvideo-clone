@@ -15,6 +15,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import {
   type FormEvent,
   type KeyboardEvent,
@@ -167,9 +168,20 @@ export default function Home() {
               </a>
             ))}
           </nav>
-          <Button className="ml-auto lg:ml-2" size="sm" onClick={() => dialogRef.current?.showModal()}>
-            Get started
-          </Button>
+          <div className="ml-auto flex items-center gap-1 lg:ml-2">
+            <Link
+              href="/login"
+              className="rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              Log in
+            </Link>
+            <Link
+              href="/register"
+              className="inline-flex h-7 items-center rounded-lg bg-primary px-2.5 text-[0.8rem] font-medium text-primary-foreground transition-colors hover:bg-primary/80 focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              Register
+            </Link>
+          </div>
         </div>
       </header>
 
